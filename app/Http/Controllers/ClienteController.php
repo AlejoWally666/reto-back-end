@@ -14,7 +14,8 @@ class ClienteController extends Controller
      */
     public function index()
     {
-        //
+        $clientes = Cliente::all();
+        return response()->json($clientes);
     }
 
     /**
@@ -35,7 +36,16 @@ class ClienteController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $cliente = new Cliente;
+        $cliente->nombre = $request->nombre;
+        $cliente->direccion = $request->direccion;
+        $cliente->cedula = $request->cedula;
+        $cliente->correo = $request->correo;
+        $cliente->telefono = $request->telefono;
+        $cliente->save();
+        return response()->json([
+            "message" => "Cliente agregado correctamente"
+        ], 201);
     }
 
     /**
@@ -44,9 +54,16 @@ class ClienteController extends Controller
      * @param  \App\Models\Cliente  $cliente
      * @return \Illuminate\Http\Response
      */
-    public function show(Cliente $cliente)
+    public function show($id)
     {
-        //
+        $cliente = Cliente::find($id);
+        if (!empty($cliente)) {
+            return response()->json($cliente);
+        } else {
+            return response()->json([
+                "message" => "Cliente no encontrado"
+            ], 404);
+        }
     }
 
     /**
@@ -69,7 +86,22 @@ class ClienteController extends Controller
      */
     public function update(Request $request, Cliente $cliente)
     {
-        //
+        if (Cliente::where('id', $id)->exists()) {
+            $cliente = Cliente::find($id);
+            $cliente->nombre = is_null($request->nombre) ? $cliente->nombre : $request->nombre;
+            $cliente->direccion = is_null($request->direccion) ? $cliente->direccion : $request->direccion;
+            $cliente->cedula = is_null($request->cedula) ? $cliente->cedula : $request->cedula;
+            $cliente->correo = is_null($request->correo) ? $cliente->correo : $request->correo;
+            $cliente->telefono = is_null($request->telefono) ? $cliente->telefono : $request->telefono;
+            $cliente->save();
+            return response()->json([
+                "message" => "Cliente actualizado corectamente"
+            ], 404);
+        } else {
+            return response()->json([
+                "message" => "Cliente no encontrado"
+            ], 404);
+        }
     }
 
     /**
@@ -78,8 +110,19 @@ class ClienteController extends Controller
      * @param  \App\Models\Cliente  $cliente
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Cliente $cliente)
+    public function destroy($id)
     {
-        //
+        if (Cliente::where('id', $id)->exists()) {
+            $cliente = Cliente::find($id);
+            $cliente->delete();
+
+            return response()->json([
+                "message" => "Cliente eliminado correctamente"
+            ], 202);
+        } else {
+            return response()->json([
+                "message" => "Cliente no encontrado."
+            ], 404);
+        }
     }
 }
